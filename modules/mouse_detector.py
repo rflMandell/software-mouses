@@ -328,4 +328,32 @@ class MouseDetector:
         return [mouse for mouse in self.mice_info
                 if mouse.connection_type.lower() == connection_type.lower()]
     
+    def get_mice_by_manufacturer(self, manufacturer: str) -> List[MouseInfo]:
+        """
+        Filtra mouses por fabricante
+        
+        Args:
+            manufacturer (str): Nome do fabricante
+            
+        Returns:
+            List[MouseInfo]: Mouses do fabricante especificado
+        """
+        return [mouse for mouse in self.mice_info if manufacturer.lower() in mouse.manufacturer.lower()]
     
+    def get_mouse_summary(self) -> Dict[str, int]:
+        """
+        Retorna um resumo dos mouses detectados
+
+        Returns:
+            Dict[str, int]: Resumo com contadores por tipo
+        """
+        summary = {
+            'total': len{self.mice_info},
+            'usb': len(self.get_mice_by_connection_type('USB')),
+            'blutetooth': len(self.get_mice_by_connection_type('Bluetooth')),
+            'outros': 0
+        }
+        
+        summary['outros'] = summary['total'] - summary['usb'] - summary['bluetooth']
+        
+        return summary
