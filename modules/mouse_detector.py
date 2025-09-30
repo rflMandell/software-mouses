@@ -274,4 +274,58 @@ class MouseDetector:
             
         return serial
     
+    def _format_release_number(self, release_number: int) -> str:
+        """Formatar o numero de release em formate legivel"""
+        if release_number == 0:
+            return 'N/A'
+        
+        #converte para formato BCD se necessario
+        major = (release_number >> 8) & 0xFF
+        minor = release_number & 0xFF
+        
+        return f"{major}.{minor:02d}"
+    
+    def _remove_duplicates(self, mice_list: List[MouseInfo]) -> List[MouseInfo]:
+        """Remove mouses duplicados baseado no path"""
+        seen_paths = set()
+        unique_mice = []
+        
+        for mouse in mice_list:
+            if mouse.path not in seen_paths:
+                seen_paths.add(mouse.path)
+                unique_mice.append(mouse)
+                
+            return unique_mice
+        
+    def get_mouse_count(self) -> int:
+        """
+        Retorna o numero de mouses detectados
+        
+        Returns:
+            int: numero de mouses unicos
+        """
+        return len(self.mice_info)
+    
+    def refresh_mice_list(self) -> List[MouseInfo]:
+        """
+        Forca uma atualizacao da lista de mouses conectados
+        
+        Returns:
+            List[MousesINfo]: lista atualizada de mouses
+        """
+        return self.get_connected_mice(force_refresh=True)
+    
+    def get_mice_by_connection_type(self, connection_type: str) -> List[MouseInfo]:
+        """
+        Filtra mouses por tipo de conexao
+        
+        Args:
+            connection_type (str): tipo de conexao (USB, Bluetooth, etc.)
+            
+        Returns:
+            List[MouseInfo]: Mouses do tipo especifico
+        """
+        return [mouse for mouse in self.mice_info
+                if mouse.connection_type.lower() == connection_type.lower()]
+    
     
