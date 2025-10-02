@@ -93,4 +93,24 @@ class MouseManagerGUI:
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f"{width}x{height}+{x}+{y}")
         
-    
+    def setup_variables(self):
+        """Configura as variaveis de controle da interface"""
+        #variaveis de configuracao
+        self.speed_var = tk.IntVar(value=10)
+        self.accel_var = tk.BooleanVar(value=True)
+        self.dclick_var = tk.IntVar(value=500)
+        self.swap_buttons_var = tk.BooleanVar(value=False)
+        self.wheel_lines_var = tk.IntVar(value=3)
+        self.hover_time_var = tk.IntVar(value=400)
+        
+        #variaveis de status
+        self.status_var = tk.StringVar(value="Inicializando...")
+        self.mice_count_var = tk.StringVar(value="0 mouses detectados")
+        
+        
+        #bind para mudancas automaticas
+        self.speed_var.trace('w', self.on_setting_change)
+        self.dclick_var.trace('w', self.on_setting_change)
+        self.wheel_lines_var.trace('w', self.on_setting_change)
+        self.hover_time_var.trace('w', self.on_setting_change)
+        
