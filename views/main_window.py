@@ -43,6 +43,7 @@ class MouseManagerGUI:
                                  f"Erro ao inicializar modulos:\n {e}")
             self.root.destroy()
             return
+        
         #variaveis de controle
         self.current_settings: Optional[MouseSettings] = None
         self.settings_backup: Optional[MouseSettings] = None
@@ -51,6 +52,9 @@ class MouseManagerGUI:
         self.refresh_job = None
         
         #variaveis da interface
+        self.setup_variables()
+        
+        #configura a interface
         self.setup_ui()
         self.setup_styles()
         
@@ -59,5 +63,34 @@ class MouseManagerGUI:
         
         #iniciar refresh automatico
         self.start_auto_refresh()
+        
+    def setup_window(self):
+        """Configura a janela principal"""
+        self.root.title("Mouse Manager MVP - Gerenciador Universal de Mouses")
+        self.root.geometry("1000x700")
+        self.root.minsize(800, 600)
+        self.root.resizable(True, True)
+        
+        #icone da janela (em breve?)
+        try: 
+            #tenta definir um icone padrao
+            self.root.iconbitmap(default="")
+        except:
+            pass
+        
+        #centraliza a janela
+        self.center_window()
+        
+        #configura o fechamento da janela
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
+    def center_window(self):
+        """Centraliza a janela na tela"""
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
         
     
