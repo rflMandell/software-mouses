@@ -107,10 +107,81 @@ class MouseManagerGUI:
         self.status_var = tk.StringVar(value="Inicializando...")
         self.mice_count_var = tk.StringVar(value="0 mouses detectados")
         
-        
         #bind para mudancas automaticas
         self.speed_var.trace('w', self.on_setting_change)
         self.dclick_var.trace('w', self.on_setting_change)
         self.wheel_lines_var.trace('w', self.on_setting_change)
         self.hover_time_var.trace('w', self.on_setting_change)
         
+    def setup_styles(self):
+        """COnfigura estilos personalizados"""
+        style = ttk.Style()
+        
+        #configura o tema
+        try:
+            styles.theme_use('clam')
+        except:
+            pass
+        
+        # estilos personalizados
+        style.configure('Title.TLabel', font=('Arial', 12, 'bold'))
+        style.configure('Subtitle.TLabel', font=('Arial', 10, 'bold'))
+        style.configure('Info,TLabel', font=('Arial', 9))
+        style.configure('Success.TLabel', foreground='green')
+        style.configure('Error.TLabel', foreground='red')
+        style.configure('Warning.TLabel', foreground='orange')
+        
+    def setup_ui(self):
+        """Configura a interface do usuario"""
+        #frame principal
+        main_frame = ttk.Frame(self.root)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        #barra de ferrmanentas supeirior
+        self.setup_toolbar(main_frame)
+        
+        # notebook para abas
+        self.notebook = ttk.Notebook(main_frame)
+        self.notebook.pack(fill=tk.BOTH, expand=True, pady=(5, 0))
+        
+        # cnofgura as abas
+        self.setup_detection_tab()
+        self.setup_settings_tab()
+        self.setup_advanced_tab()
+        self.setup_about_tab()
+        
+        #barra de status
+        self.setup_status_bar(main_frame)
+        
+    def setup_toolbar(self, parent):
+        """Configura a toolbar"""
+        toolbar = ttk.Frame(parent)
+        toolbar.pack(fill=tk.X, pady=(0,5))
+        
+        #titulo principal
+        title_label = ttk.Label(toolbar, text="Mouse Manager MVP",
+                                style='Title.TLabel')
+        title_label.pack(side=tk.LEFT)
+        
+        #botoes da toolbar
+        buttom_frame = ttk.Frame(toolbar)
+        buttom_frame.pack(side=tk.RIGHT)
+        
+        ttk.Button(button_frame, text="Atualizar Tudo",
+                   command=self.refresh_all_data).pack(side=tk.LEFT, padx=2)
+        
+        ttk.Button(button_frame, text="Backup",
+                   command=self.create_backup).pack(side=tk.LEFT, padx=2)
+        
+        ttk.Button(button_frame, text="Restaurar",
+                   command=self.restore_backup).pack(side=tk.LEFT, padx=2)
+        
+        ttk.Button(button_frame, text="Padroes",
+                   command=self.restore_defaults).pack(side=tk.LEFT, padx=2)
+        
+        #checkbox para auto-refresh
+        ttk.Checkbutton(button_frame, text="Auto-refresh",
+                        variable=self.auto_refresh_enable,
+                        command=self.toggle_auto_refresh).pack(side=tk.LEFT, padx=5)
+        
+    def setup_detection_tab(self):
