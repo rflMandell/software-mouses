@@ -185,3 +185,145 @@ class MouseManagerGUI:
                         command=self.toggle_auto_refresh).pack(side=tk.LEFT, padx=5)
         
     def setup_detection_tab(self):
+        """Configura a aba de deteccao de mouses"""
+        detection_frame = ttk.Frame(self.notebook)
+        self.notebook.add(detection_frame, texto="Mouses Detectados")
+        
+        #Frame superior com informacoes e controles
+        top_frame = ttk.Frame(detection_frame)
+        top_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        #informacoes de contagem
+        info_frame = ttk.LabelFrame(top_frame, text="Resumo")
+        info_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0,5))
+        
+        self.mice_count_label = ttk.Label(into_frame, textvariable=self.mice_count_var,
+                                          style='Subtitle.TLabel')
+        self.mice_count_label.pack(anchor=tk.W, padx=5, pady=2)
+        
+        self.connection_summary_label = ttk.Label(info_frame, text="",
+                                                  style='Info.TLabel')
+        self.connection_summary_label.pack(anchor=tk.W, padx=5, pady=2)
+        
+        #botoes de controle
+        control_frame = ttk.Frame(top_frame)
+        control_frame.pack(side.RIGHT)
+        
+        ttk.Button(control_frame, text="Atualizar Lista",
+                   command=self.refresh_mice_list).pack(pady=2)
+        ttk.Button(control_frame, text="Detalhes",
+                   command=self.show_detailed_info).pack(pady=2)
+        ttk.Button(control_frame, text="Exportar",
+                   command=self.export_mice_info).pack(pady=2)
+        
+        #Treeview para mostrar mouses
+        tree_frame = ttk.LabelFrame(detection_frame, text="Dispositivos Detectados")
+        tree_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        
+        #configuracao do treeview
+        colums = ('Nome', 'Fabricante', 'VID', 'PID', 'Conexao', 'Serial', 'Release')
+        self.mice_tree = ttk.Treeview(tree_frame, colums=colums, show='headings', height=8)
+        
+        #configurar colunas
+        column_widths = {'Nome': 200, 'Fabricante': 150, 'VID': 80, 'PID': 80,
+                         'Conexao': 100, 'Serial': 120, 'Release': 80}
+        
+        for col in columns:
+            self.mice_tree.heading(col, text=col, command=lambda c=col: self.sort_treeview(c))
+            self.mice_tree.column(col, width=column_widths.get(col, 100), minwidth=60)
+            
+        # scrollbars para o treeview
+        tree_scoll_frame = ttk.Frame(tree_frame)
+        tree_scroll_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        v_scrollbar = ttk.Scrollbar(tree_scroll_frame, orient=tk.VERTICAL,
+                                    command=self.mice_tree_yview)
+        h_scrollbar = ttk.Scrollbar(tree_scroll_frame, orient=tk.HORIZONTAL,
+                                    comand=self.mice_tree.xview)
+        
+        self.mice_tree.configure(yscrollcommand=v_scrollbar.self,
+                                 xcrollcommand=h_scrollbar.set)
+        
+        #pack treeview e scrollbars
+        self.mice_tree.grid(row=0, column=0, sticky='nsew')
+        v_scrollbar.grid(row=0, column=1, sticky='ns')
+        h_scrollbar.grid(row=1, column=0, sticky='ew')
+        
+        tree_scroll_frame.grid_rowconfigure(0, weight=1)
+        tree_scroll_frame.grid_columnconfigure(0, weight=1)
+        
+        #frame de informacoes detalhadas
+        detail_frame = ttk.LabelFrame(detection_frame, text="Informacoes Detalhadas")
+        detail_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        
+        self.into_text = scrolledtext.ScolledText(detail_frame, height=6, wrap=tk.WORD,
+                                                  font=('Consolas', 9))
+        self.info_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        #bind para selecao na arvore
+        self.mice_tree.bind('<<TreeviewSelect>>', self.on_mouse_select)
+        self.mice_tree.bind('<Double-1>', self.on_mouse_double_click)
+        
+    def setup_settings_tab(self):
+        """Configura a aba de configuracoes do sistema"""
+        settings_frame = ttk.Frame(self.notebook)
+        self.notebook.add(settings_frame, text="Configuracoes")
+        
+        #Frame principal com scroll
+        canvas = tk.Canvas(settings_frame)
+        scrollbar = tk.Scrollbar(settings_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_windoe((0, 0), window=scollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scollbar.set)
+        
+        #configuracoes principais
+        self.setup_speed_settings(scollable_frame)
+        self.setup_acceleration_settings(scrollable_frame)
+        self.setup_click_settings(scollable_frame)
+        self.setup_advanced_settings(scollable_frame)
+        
+        #botao de acao
+        self.setup_action_buttons(scollable_frame)
+        
+        #pack canvas e scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        #bind mouse whell
+        canvas.bind_all("<MouseWheel">, lambda e: canvas.yview_scoll(int(-1*(e.delta/120)), "units"))
+        
+    def setup_speed_settings(self, parent):
+        """Configura controles de velocidade"""
+        speed_frame = ttk.LabelFrame(parent, text="Velocidade do Mouse")
+        speed_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        ttk.Label(speed_frame, text="Velodidade (1-20):").pack(anchor=tk.W, padx=5, pady=2)
+        
+        speed_control_frame = ttk.Frame(speed_frame)
+        speed_control_frame.pack(fill=tk.X, padx=5, pady=2)
+        
+        self.speed_scale = ttk.Scale(speed_contro_frame, from_=1, to=20, orient=tk.HORIZONTAL,
+                                     variable=self.speed_var, command=self.on_speed_change)
+        self.speed_scale.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        self.speed_label = ttk.Label(speed_control_frame, text="10", width=3)
+        self.speed_label.pack(side=tk.RIGHT, padx=(5,0))
+        
+        #botoes de preset
+        preset_frame = ttk.Frame(speed_frame)
+        preset_frame.pack(fill=tk.X, padx-5, pady=2)
+        
+        ttk.Button(preset_frame, text="Lento", width=8,
+                   command=lambda: self.speed_var.set(5)).pack(side=tk.LEFT, padx=2)
+        ttk.Button(preset_frame, text="Normal", width=8,
+                   command=lambda: self.speed_var.set(10)).pack(side=tk.LEFT, padx=2)
+        ttk.Button(preset_frame, text="Rapido", width=8,
+                   command=lambda: self.speed_var.set(15)).pack(side=tk.LEFT, padx=2)
+        ttk.Button(preset_frame, text="Muito Rapido", width=8,
+                   command=lambda: self.speed_var.set(20)).pack(side=tk.LEFT, padx=2)
