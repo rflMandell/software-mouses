@@ -327,3 +327,352 @@ class MouseManagerGUI:
                    command=lambda: self.speed_var.set(15)).pack(side=tk.LEFT, padx=2)
         ttk.Button(preset_frame, text="Muito Rapido", width=8,
                    command=lambda: self.speed_var.set(20)).pack(side=tk.LEFT, padx=2)
+        
+    def setup_acceleration_settings(self, parent):
+        """Configura controles de aceleracao"""
+        accel_frame = ttk.LabelFrame(parent, text="Aceleracao do Mouse")
+        accel_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        #checkbox principal
+        accel_check = ttk.Checkbutton(accel_frame, text="Habilitar aceleracao do mouse",
+                                        variable=self.accel_var, command=self.on_acceleration_change)
+        accel_check.pack(anchor=tk.W, padx=5, pady=5)
+        
+        #Frame para niveis de aceleracao
+        level_frame = ttk.Frame(accel_frame)
+        level_frame.pack(fill=tk.X, padx=5, pady=2)
+        
+        ttk.Label(level_frame, text="Nivel:").pack(side=tk.LEFT)
+        
+        ttk.Button(level_frame, txt="Baixo", width=8,
+                    command=lambda: self.set_acceleration_level(MouseAcceleration.LOW)).pack(side=tk.LEFT, padx=2)
+        ttk.Button(level_frame, txt="Medio", width=8,
+                    command=lambda: self.set_acceleration_level(MouseAcceleration.MEDIUM)).pack(side=tk.LEFT, padx=2)
+        ttk.Button(level_frame, txt="Alto", width=8,
+                    command=lambda: self.set_acceleration_level(MouseAcceleration.HIGH)).pack(side=tk.LEFT, padx=2)
+        
+        #informacoes sobre
+        info_label = ttk.Label(accel_frame, 
+                               text="A aceleracao faz o cursor se mover mais rapido quando voce mode o mouse rapidamente.",
+                               style='Info.TLabel', wraplength=400)
+        info_label.pack(anchor=tk.W, padx=5, pady=2)
+        
+    def setup_click_settings(self, parent):
+        """Configura controles de clique"""
+        click_frame = ttkLabelFrame(parent, text="Configuracoes de Clique")
+        click_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        #velodicdade do duplo clique
+        dclick_subframe = ttk.Frame(click_frame)
+        dclick_subframe.pack(fill=tk.X, padx=5, pady=2)
+        
+        ttk.Label(dclick_subframe, text="Velocidade do Duplo Clique (100-900 ms):").pack(anchor=tk.W)
+        
+        dclick_control_frame = ttk.Frame(dclick_subframe)
+        dclick_control_frame.pack(fill=tk.X, pady=2)
+        
+        self.dclick_scale = ttk.Scale(dclick_control_frame, from_=100, to=900, orient=tk.HORIZONTAL,
+                                      variable=self.dclick_var, command=self.on_click_change)
+        self.dclick_scale.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        self.dclick_label = ttk.Label(dclick_control_frame, text="500ms", width=8)
+        self.dclick_label.pack(side=tk.RIGHT, padx=(5,0))
+        
+        #botao de teste
+        ttk.Button(dclick_subframe, text="Testar Duplo Clique",
+                   command=self.test_double_click).pack(anchor=tk.W, pady=2)
+        
+        #troca de botoes
+        ttk.Checkbutton(click_frame, text="Trocar botoes primario e secundario",
+                        variable=self.swap_buttons_var,
+                        command=self.on_button_swap_change).pack(anchor=tk.W, padx=5, pady=5)
+        
+    def setup_advanced_settings(self, parent):
+        """Configura configuracoes avancadas"""
+        advanced_frame = ttk.LabelFrame(parent, text="Configuracoes Avancadas")
+        advanced_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        #scroll da roda
+        whell_subframe = ttk.Frame(advanced_frame)
+        shell_subframe.pack(fill=tk.X, padx=10, pady=5)
+        
+        ttk.Label(wheel_subframe, text="Linhas por scroll da roda (1-100):").pack(anchor=tk.W)
+        
+        wheel_control_frame = ttk.Frame(wheel_subframe)
+        wheel_control_frame.pack(fill=tk.X, pady=2)
+        
+        self.wheel_scale = ttk.Scale(wheel_control_frame, from_=1, to=100, orient=tk.HORIZONTAL,
+                                     variable=self.wheel_lines_var, command=self.on_wheel_change)
+        self.wheel_scale.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        self.wheel_label = ttk.Label(wheel_control_frame, text="3", width=4)
+        self.wheel_label.pack(side=tk.RIGHT, padx=(5,0))
+        
+        #tempo de hover
+        hover_subframe = ttk.Frame(advanced_frame)
+        hover_subframe.pack(fill=tk.X, padx=5, pady=2)
+        
+        ttk.Label(hover_subframe, text="Tempo de hover (100-2000 mx):").pack(anchor=tk.W)
+        
+        hover_control_frame = ttk.Frame(hover_subframe)
+        hover_control_frame.pack(fill=tk.X, pady=2)
+        
+        self.hover_scale = ttk.Scale(hover_control_frame, from_=100, to=2000, orient=tk.HORIZONTAL,
+                                     variable=self.hover_time_var, command=self.on_hover_change)
+        self.hover_scale.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        self.hover_label = ttk.Label(hover_control_frame, text="400 ms", width=8)
+        self.hover_label.pack(side=tk.RIGHT, padx=(5,0))
+        
+    def setup_action_buttons(self, parent):
+        """Configura botoes de acao"""
+        button_frame = ttk.LabelFrame(parent, tect="Acoes")
+        button_frame.pack(fill=tk.X, padx=10, pady=10)
+        
+        # Primeira linha de botoes
+        row1 = ttk.Frame(buton_frame)
+        row1.pack(fill=tk.X, padx=5, pady=2)
+        
+        ttk.Button(row1, text="Aplicar configuracoes", 
+                   command=self.apply_settings).pack(side=tk.LEFT, padx=2)
+        ttk.Button(row1, text="Atualizar",
+                   command=self,load_current_settings).pack(side=tk.LEFT, padx=2)
+        ttk.Button(row1, text="Restaurar Padroes",
+                   command=self.restore_defaults).pack(side=tk.LEFT, padx=2)
+        
+        #segunda linha de butoes
+        row2 = ttk.Frame(buton_frame)
+        row2.pack(fill=tk.X, padx=5, pady=2)
+        
+        ttk.Button(row2, text="Criar Backup",
+                   command=self,create_backup).pack(side=tk.LEFT, padx=2)
+        ttk.Button(row2, text="Restaurar Backup",
+                   command=self.restore_backup).pack(side=tk.LEFT, padx=2)
+        ttk.Button(row2, text="Ver Resumo",
+                   command=self.show_settings_summary).pack(side=tk.LEFT, padx=2)
+        
+    def setup_advanced_tab(self):
+        """Configura a aba de configuracoes avancadas"""
+        advanced_frame = ttk.Frame(self.notebook)
+        self.notebook.add(advanced_frame, text="Avancado")
+        
+        #informacoes do sistema
+        system_frame = ttkLabelFrame(advanced_frame, text="Informacoes do Sistema")
+        system_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        self.system_info_text = scrolledtext.ScolledText(system_frame, height=8, wrap=tk.WORD,
+                                                         font=('Consolas', 9))
+        self.system_info_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        #ferramentas de diagnostico
+        diag_frame = ttk.LabelFrame(advanced_frame, text="Ferramentas de Diagnostico")
+        diag_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        diag_buttons = ttk.Frame(diag_frame)
+        diag_buttons.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(diag_buttons, text="Verificar Sistemas",
+                   command=self.run_system_check).pack(side=tk.LEFT, padx=2)
+        ttk.Button(diag_buttons, text="Estatisticas",
+                   command=self.show_hid_stats).pack(side=tk.LEFT, padx=2)
+        ttk.Button(diag_buttons, text="Teste de Performace",
+                   command=self.run_performance)_test.pack(side=tk.LEFT, padx=2)
+        
+        #log de atividades
+        log_frame = ttk.LabelFrame(advanced_frame, text="Log de Atividades")
+        log_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        
+        self.log_text = scrolledtext.ScrolledText(log_frame, height=10, wrap=tk.WORD,
+                                                  font=('Consolas', 8))
+        self.log_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        #bootes do log
+        log_buttons = ttk.Frame(log_frame)
+        log_buttons.pack(fill=tk.X, padx=5, pady=2)
+        
+        ttk.Button(log_buttons, text="Limpar Log",
+                   command=self.clear_log).pack(side=tk.LEFT, padx=2)
+        ttk.Button(log_buttons, text="Salvar Log",
+                   command=self.save_log).pack(side=tk.LEFT, padx=2)
+        
+    def setup_about_tab(self):
+        """Configura a aba sobre"""
+        about_frame = ttk.Frame(self.notebook)
+        self.notebook.add(about_frame, text="Sobre")
+        
+        #titulo e versao
+        title_frame = ttk.Frame(about_time)
+        title_frame.pack(fill=tk.X, padx=20, pady=20)
+        
+        ttk.Label(title_frame, text="Mouse Manager MPV",
+                  font('Arial', 16, 'bold')).pack()
+        ttk.Label(title_frame, text="Versao 1.0.0",
+                  font('Arial', 12)).pack(pady=5)
+        ttk.Label(title_frame, text="Software Universal apra gerenciamento de Mouses Genericos",
+                  font=('Arial', 10)).pack()
+        
+        #informacoes
+        info_text = """
+Funcionalidades:
+- Deteccao automatica de mouses HID
+- Configuracao de velocidade e aceleracao
+- Contole de duplo Clique e scroll
+- Backup e restauracao de configuracoes
+- Interface moderna e intuitiva
+
+Tecnologias:
+- Python
+- TKinter
+- HIDAPI
+- ctypes
+
+Requisitos:
+- Windows 10/11
+- Python 3.7 ou superior
+- Biblioteca hidapi
+
+Desenvolvido como MVP
+para demonstracao de capacidades de deteccao
+e configuracao de mouses genericos.
+
+Seguranca:
+- Apenas le informacoes de dispositivos HID
+- Modifica apenas configuracoes padrao do Windows
+- Nao instala drivers ou altera arquivos do sistema
+        """
+        
+        info_label = ttk.LAbel(about_frame, text=info_text, justify=tk.LEFT,
+                               font('Arial', 9))
+        info_label.pack(padx=20, pady=10, anchor=tk.W)
+    
+    def setup_status_bar(self, parent):
+        """Configura a barra de status"""
+        status_frame = ttk.Frame(parent)
+        status_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=(5,0))
+        
+        #status principal
+        self.status_label = ttk.Label(status_frame, textvariable=self.status_var,
+                                      rlief=tk.SUNKEN, anchor=tk.W)
+        self.status_label.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        #indicador de admin
+        self.admin_label = ttk.Label(status_frame, text="", relief=/tk.SUNKEN, width=15)
+        self.admin_label.pack(side=tk.RIGHT, padx=(2, 0))
+        
+        #atualiza status de admin
+        self.update_admin_status()
+        
+    def load_initial_data(self):
+        """Carrega dados inicais"""
+        def load_in_thread():
+            try:
+                self.status_var.set("Carregando configuracoes...")
+                self.load_current_settings()
+                
+                self.status_var.set("Detectando mouses...")
+                self.refresh_mice_list()
+                
+                self.status_var.set("Carregando informacoes do sistema...")
+                self.load_system_info()
+                
+                self.status_var.set("Pronto")
+                self.log_message("sistema inicializado com sucesso")
+                
+            except Exception as e:
+                self.satus_var.set(f"Erro na inicializacao: {e}")
+                self.lof_message(f"Erro na inicializacao: {e}", "ERRO")
+                
+                threading.Thread(target=load_in_thread, daemon=True).start()
+                
+    def refresh_mice_list(self):
+        """Atualiza a lista de mouses detectados"""
+        def update_in_thread()
+            try:
+                self.status_var.set("detectando mouses...")
+                
+                mice = self.mouse_detector.get_connected_mice(force_refresh=True)
+                
+                #Atualiza a interface na thread principal
+                self.root.after(0, self._update_mice_display, mice)
+                
+            except Exception as e:
+                self.root.after(0, lambda: self.status_var.set(f"Erro ao detectar mouses: {e}"))
+                self.log_message(f"Erro ao detectar mouses: {e}", "ERROR")
+                
+        threading.Thread(target=update_in_thread, deamo=True).start()
+        
+    def _update_mice_display(self, mice: List[MouseInfo]):
+        """Atualiza a exibicao dos mouses na interface"""
+        try:
+            #limpa a arvore
+            for item in self.mice_tree.get_children():
+                self.mice_tree.delete(item)
+                
+            #adicione os mouses detectados
+            for mouse in mice:
+                self.mice_tree.insert('', tk.END, values=(
+                    mouse.name,
+                    mouse.manufacturer,
+                    mouse.vendor_id,
+                    mouse.product_id,
+                    mouse.connection_type,
+                    mouse.serial_number,
+                    mouse.release_number
+                ))
+                
+            #atualiza contadores
+            count = len(mice)
+            self.mice_count_var.set(f"{count} mouse(s) detectados(s)")
+            
+            #atualiza resumo de conexoes 
+            summary = self.mouse_detector.get_mouse_summary()
+            summary_text = f"USB: {summary['usb']} | Bluetooth: {summary['bluetooth']} | Outro: {summary['outros']}"
+            self.connection_summary_label.config(text=summary_text)
+            
+            self.status_var.set(f"Detectados {count} mouse(s)")
+            self.log_message(f"Detectados {count} mouses(s)")
+            
+        except Exception as e:
+            self.status_var.set(f"Erro ao ataulizar lista: {e}")
+            self.log_message(f"Erro ao atualizar lista: {e}", "ERROR")
+            
+    def on_mouse_select(self, event):
+        """Callback para selecao de mouse na arvore"""
+        try:
+            selection = self.mice_tree.selection()
+            if not selection:
+                return
+            
+            item = self.mice_tree.item(selection[0])
+            values=item['values']
+            
+            if len(values) < 4:
+                return
+            
+            #encontra o mouse correspondente
+            mice = self. mouse_detector.mice_info
+            selected_mouse = None
+            
+            for mouse in mice:
+                if (mouse.name == values[0] and
+                    mouse.vendor_id == values[2] and
+                    mouse.product_id == values[3]):
+                    select_mouse = mouse
+                    break
+                
+            if selected_mouse:
+                self.show_mouse_details(selected_mouse)
+                
+        except Exception as e:
+            self.log_message(f"Erro ao selecionar mouse: {e}", "ERROR")
+            
+    def on_mouse_double_click(self, event):
+        """Callback para duplo clique no mouse"""
+        try:
+            selection = self.mice_tree.selection()
+            if selection:
+                self.show_detailed_info()
+        except Exception as e:
+            self.log_message(f"Erro no duplo clique: {e}", "ERROR")
+            
+            
