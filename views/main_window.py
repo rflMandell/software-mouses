@@ -675,4 +675,97 @@ Seguranca:
         except Exception as e:
             self.log_message(f"Erro no duplo clique: {e}", "ERROR")
             
+    def show_mouse_deatils(self, mouse: MouseInfo):
+        """Mostra detalhes do mouse selecionado"""
+        try:
+            details = ''
             
+    def load_current_settings(self):
+        """Carrega as configuracoes atuais do sistema"""
+        def load_in_thread():
+            try:
+                self.current_settings = self.system_settings.get_current_settings()
+                
+                # atualiza a interface na thread principal
+                self.root.after(0, self._update_settings_display)
+                
+            except Exception as e:
+                self.root.after(0, lambda: messagebox.showerror("Erro", f"Erro ao carregar configuracoes:\n{e}"))
+                self.log_message(f"Erro ao carregar configuracoes: {e}", "ERROR")
+                
+        threading.Thread(target=load_in_thread, daemon=True).start()
+        
+    def _update_settings_display(self):
+        """Atualiza a exibicao das configuracoes na interface"""
+        if not self.current_settings:
+            return
+        
+        try:
+            #atualiza variaveis sem disparar callbacks
+            self.speed_var.set(self.current_settings.speed)
+            self.accel_vat.set(self.current_settings.acceleraion_enable)
+            self.dclick_var.set(self.current_settings.double_click_speed)
+            self.swap_buttons_var.set(self.current_settings.swap_buttons)
+            self.wheel_lines_vat.set(self.current_settings.wheel_scroll_lines)
+            self.hover_time_vat.set(self.current_settings.hover_time)
+            
+            #atualiza labels
+            self.speed_label.config(text=str(self.current_settings.speed))
+            self.dclick_label.config(text=f"{self.current_settings.double_click_speed} ms")
+            self.wheel_label.config(text=str(self.current_settings.wheel_scroll_lines))
+            self.hover_label.config(text=f"{self.current_settings.hover_time} ms")
+            
+            self.status_var.set("Configuracoes carregadas")
+            self.log_message("Configuracoes carregadas com sucesso")
+            
+        except Exception as e:
+            self.log_message(f"Erro ao atualizar interface: {e}", "ERROR")
+            
+    #callbacks para mudancas nas configuracoes
+    def on_speed_change(self, value):
+        """Callback para mudanca na velocidade"""
+        speed = int(float(value))
+        self.speed_label.config(test=str(speed))
+        
+    def on_acceleration_change(self):
+        """Callback para mudanca na aceleracao"""
+        self.log_message(f"Aceleracao {'habilitada' if self.accel_var.get() else 'desabilitada'}")
+        
+    def on_dclick_change(self, value):
+        """Callback para mudanca na velocidade do dublo clique"""
+        speed = int(float(value))
+        self.dclick_label.config(text=f"{speed} ms")
+        
+    def on_button_swap_change(self):
+        """Callback para mudanca na troca de botoes"""
+        self.log_message(f"Botoes {'trocados' if self.swap_buttons_vat.get() else 'normais'}")
+        
+    def on_wheel_change(self, value):
+        """Callback para mudanca nas linhas de scroll"""
+        lines = int(float(value))
+        self.wheel_label.config(text=str(lines))
+        
+    def on_hover_change(self, value):
+        """Callback para mudanca no tempo de hover"""
+        time_ms = int(float(value))
+        self.hover_label.config(text=f"{time_ms} ms")
+    
+    def on_settings_change(self, *args):
+        """Callback generico para mudancas nas configuracoes"""
+        #usar futuramente para auto-aplicar configuracoes
+        pass
+    
+    #metodos de acao
+    def apply_settings(self):
+        """Aplica as confoiguracoes selecionadas"""
+        def apply_in_thread():
+            try:
+                self.status_var.set("Aplicando configuracoes...")
+                
+                #cria objeto com as configuracoes atuais da interface
+                new_settings = MouseSettings(
+                    speed=self.speed_var.get(),
+                    acceleration_threshold1=6 if self.accel_var.get() else 0,
+                    acceleration_threshold2=10 if self.accel_var.get() else 0,
+                    
+                )
