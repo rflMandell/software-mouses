@@ -1,8 +1,8 @@
-    """
+"""
     Modulo para gerenciar configuracoes do mouse do Windows
     Utiliza ctypes para acessar APIs do Windows de forma segura
     Versao: 1.0.0
-    """
+"""
     
 import ctypes
 from ctypes import wintypes, byref, c_int, c_uint, c_bool, Structure, POINTER
@@ -34,7 +34,7 @@ class MouseSettings:
     drag_width: int 
     drag_height: int 
     
-class SystemMouseSettings
+class SystemMouseSettings:
     """
     Gerenciador de configuracoes do mouse no Windows
     Utilizar APIs nativas do Windows para maxima compatibilidade

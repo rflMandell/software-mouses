@@ -296,7 +296,7 @@ class MouseManagerGUI:
         scrollbar.pack(side="right", fill="y")
         
         #bind mouse whell
-        canvas.bind_all("<MouseWheel">, lambda e: canvas.yview_scoll(int(-1*(e.delta/120)), "units"))
+        canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scoll(int(-1*(e.delta/120)), "units"))
         
     def setup_speed_settings(self, parent):
         """Configura controles de velocidade"""
@@ -317,7 +317,7 @@ class MouseManagerGUI:
         
         #botoes de preset
         preset_frame = ttk.Frame(speed_frame)
-        preset_frame.pack(fill=tk.X, padx-5, pady=2)
+        preset_frame.pack(fill=tk.X, padx=5, pady=2)
         
         ttk.Button(preset_frame, text="Lento", width=8,
                    command=lambda: self.speed_var.set(5)).pack(side=tk.LEFT, padx=2)
@@ -436,7 +436,7 @@ class MouseManagerGUI:
         ttk.Button(row1, text="Aplicar configuracoes", 
                    command=self.apply_settings).pack(side=tk.LEFT, padx=2)
         ttk.Button(row1, text="Atualizar",
-                   command=self,load_current_settings).pack(side=tk.LEFT, padx=2)
+                   command=self.load_current_settings).pack(side=tk.LEFT, padx=2)
         ttk.Button(row1, text="Restaurar Padroes",
                    command=self.restore_defaults).pack(side=tk.LEFT, padx=2)
         
@@ -445,7 +445,7 @@ class MouseManagerGUI:
         row2.pack(fill=tk.X, padx=5, pady=2)
         
         ttk.Button(row2, text="Criar Backup",
-                   command=self,create_backup).pack(side=tk.LEFT, padx=2)
+                   command=self.create_backup).pack(side=tk.LEFT, padx=2)
         ttk.Button(row2, text="Restaurar Backup",
                    command=self.restore_backup).pack(side=tk.LEFT, padx=2)
         ttk.Button(row2, text="Ver Resumo",
@@ -476,7 +476,7 @@ class MouseManagerGUI:
         ttk.Button(diag_buttons, text="Estatisticas",
                    command=self.show_hid_stats).pack(side=tk.LEFT, padx=2)
         ttk.Button(diag_buttons, text="Teste de Performace",
-                   command=self.run_performance)_test.pack(side=tk.LEFT, padx=2)
+                   command=self.run_performance_test).pack(side=tk.LEFT, padx=2)
         
         #log de atividades
         log_frame = ttk.LabelFrame(advanced_frame, text="Log de Atividades")
@@ -505,9 +505,9 @@ class MouseManagerGUI:
         title_frame.pack(fill=tk.X, padx=20, pady=20)
         
         ttk.Label(title_frame, text="Mouse Manager MPV",
-                  font('Arial', 16, 'bold')).pack()
+                  font=('Arial', 16, 'bold')).pack()
         ttk.Label(title_frame, text="Versao 1.0.0",
-                  font('Arial', 12)).pack(pady=5)
+                  font=('Arial', 12)).pack(pady=5)
         ttk.Label(title_frame, text="Software Universal apra gerenciamento de Mouses Genericos",
                   font=('Arial', 10)).pack()
         
@@ -542,7 +542,7 @@ Seguranca:
         """
         
         info_label = ttk.LAbel(about_frame, text=info_text, justify=tk.LEFT,
-                               font('Arial', 9))
+                               font=('Arial', 9))
         info_label.pack(padx=20, pady=10, anchor=tk.W)
     
     def setup_status_bar(self, parent):
@@ -556,7 +556,7 @@ Seguranca:
         self.status_label.pack(side=tk.LEFT, fill=tk.X, expand=True)
         
         #indicador de admin
-        self.admin_label = ttk.Label(status_frame, text="", relief=/tk.SUNKEN, width=15)
+        self.admin_label = ttk.Label(status_frame, text="", relief=tk.SUNKEN, width=15)
         self.admin_label.pack(side=tk.RIGHT, padx=(2, 0))
         
         #atualiza status de admin
@@ -586,7 +586,7 @@ Seguranca:
                 
     def refresh_mice_list(self):
         """Atualiza a lista de mouses detectados"""
-        def update_in_thread()
+        def update_in_thread():
             try:
                 self.status_var.set("detectando mouses...")
                 
@@ -675,7 +675,7 @@ Seguranca:
         except Exception as e:
             self.log_message(f"Erro no duplo clique: {e}", "ERROR")
             
-    def show_mouse_deatils(self, mouse: MouseInfo):
+    def show_mouse_details(self, mouse: MouseInfo):
         """Mostra detalhes do mouse selecionado"""
         try:
             details = ''

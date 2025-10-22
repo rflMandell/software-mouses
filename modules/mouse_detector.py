@@ -348,7 +348,7 @@ class MouseDetector:
             Dict[str, int]: Resumo com contadores por tipo
         """
         summary = {
-            'total': len{self.mice_info},
+            'total': len(self.mice_info),
             'usb': len(self.get_mice_by_connection_type('USB')),
             'blutetooth': len(self.get_mice_by_connection_type('Bluetooth')),
             'outros': 0
