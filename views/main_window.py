@@ -888,3 +888,13 @@ Seguranca:
     
     def test_double_click(self):
         """Testa a velocidade do duplo clique"""
+        
+    def run(self):
+        """Inicia a aplicação"""
+        try:
+            self.root.mainloop()
+        except KeyboardInterrupt:
+            self.on_closing()
+        except Exception as e:
+            messagebox.showerror("Erro Fatal", f"Erro fatal na aplicação:\n{e}")
+            self.root.destroy()
