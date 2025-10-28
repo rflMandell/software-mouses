@@ -765,7 +765,126 @@ Seguranca:
                 #cria objeto com as configuracoes atuais da interface
                 new_settings = MouseSettings(
                     speed=self.speed_var.get(),
+                    acceleration_enable=self.accel_var.get(),
                     acceleration_threshold1=6 if self.accel_var.get() else 0,
                     acceleration_threshold2=10 if self.accel_var.get() else 0,
-                    
+                    acceleration_factor=1 if self.accel_var.get() else 0,
+                    double_click_speed=self.dclick_var.get(),
+                    swap_buttons=self.swap_buttons_var.get(),
+                    wheel_scroll_lines=self.wheel_lines_var.get(),
+                    hover_time=self.hover_time_vat.get(),
+                    drag_width=4, #valor padrao
+                    drag_height=4
                 )
+                
+                #aplica as configs
+                results = self.system_settings.apply_settings(new_settings)
+                
+                #verifica resultados
+                success_count = sum(1 for success in results.value() if success)
+                total_count = len(results)
+                
+                if success_count == total_count:
+                    message = "Todas as configuracoes foram aplicadas com sucesso."
+                    self.root.after(0, lambda: messagebox.showinfo("Sucesso", message))
+                    self.root.after(0, lambda: self.status_var.set("Configuracoes aplicadas com sucesso."))
+                    self.log_message("Configuracoes aplicadas com sucesso.", "INFO")
+                else:
+                    failed = [key for key, success in results.items() if not success]
+                    message = f"Algumas configuracoes falharam: {', '.join(failed)}"
+                    self.root.after(0, lambda: messagebox.showwarning("Aviso", message))
+                    self.root.after(0, lambda: self.status_var.set("Aplicacao parcial"))
+                    self.log_message(f"Aplicacaoo parcial: {message}", "WARNING")
+                    
+            except Exception as e:
+                error_msg = f"Erro ao aplicar onfiguracoes: {e}"
+                self.root.after(0, lambda: messagebox.showerror("Erro", error_msg))
+                self.root.after(0, lambda: self.status_var.set("erro na aplicacao"))
+                self.log_message(error_msg, "ERROR")
+                
+        threading.Thread(target=apply_in_thread, daemon=True).start()
+        
+    def restore_defaults(self):
+        """Restaura configuracoes padrao"""
+        if messagebox.askyesno("Confirmar", "Deseja restaurar todas as configuracoes para os valores padrao?"):
+            def restore_in_thread():
+                try:
+                    self.status_var.set("Restaurando padroes...")
+                    
+                    results = self.system_settings.restore_defaults()
+                    success_count = sum(1 for success in results.values() if success)
+                    
+                    if success_count > 0:
+                        self.root.after(0, self.load_current_settings)
+                        self.root.after(0, lambda: messagebox.showinfo("Sucesso", "Configuracoes padrao restauradas!"))
+                        self.log_message("COnfiguracoes padrao restauradas")
+                    else:
+                        self.root.after(0, lambda: messagebox.showerror("Erro", "Falha ao restaurar configuracoes padrao"))
+                        self.log_message("Falha ao restaurar configuracoes padrao", "ERROR")
+                        
+                except Exception as e:
+                    error_msg = f"Erro ao restaurar configuracoes: {e}"
+                    self.root.after(0, lambda: messagebox.showerror("Erro", error_msg))
+                    self.log_message(error_msg, "ERROR")
+                    
+            threading.Thread(target=restore_in_thread, daemon=True).start()
+            
+    def create_backup(self):
+        """Cria um backup das confoiguracoes atuais"""
+        try:
+            self.settings_backup = self.system_settings.backup_settings()
+            messagebox.showinfo("Backup", "BAckup das configuracoes criado com sucesso!")
+            self.log_message("Backup das configuracoes criado")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao criar backup:\n{e}")
+            self.log_message(f"Erro ao criar backup: {e}", "ERROR")
+            
+    def restore_backup(self):
+        """Restaura configuracoes a partir do backup"""
+        if not self.settings_backup:
+            messagebox.showwarning("Aviso", "nenhum backup disponivel. Crie um backup antes de utilizar essa funcao")
+            return
+        
+        if messagebox.messagebox.askyesno("Confirmar", "Deseja resturar as configuracoes do backup?"):
+            def restore_in_thread():
+                try:
+                    self.status_var.set("restaurando backup...")
+                    
+                    results = self.system_settings.restore_from_backup(self.settings_backup)
+                    success_count = sum(1 for success in results.values() if success)
+                    
+                    if success_count > 0:
+                        self.root.after(0, self.load_current_settings)
+                        self.root.after(0, lambda: messagebox.showinfo("sucesso", "Backup restaurado com sucesso!"))
+                        self.log_message("Backup restaurado com sucesso")
+                    else:
+                        self.root.after(0, lambda: messagebox.showerror("Erro", "falha ao restaurar backup"))
+                        self.log_message("falha ao restaurar backup", "ERROR")
+                    
+                except Exception as e:
+                    error_msg = f"Erro ao restaurar backup: {e}"
+                    self.root.after(0, lambda: messagebox.showerror("Erro", error_msg))
+                    self.log_message(error_msg, "ERROR")
+                    
+            threading.Thread(target=restore_in_thread, daemon=True).start()
+            
+    #metodos utilitarios
+    def set_acceleration_level(self, level: MouseAcceleration):
+        """Define o nivel de aceleracao"""
+        try:
+            self.accel_var.set(True)
+            success = self.system_settings.enable_mouse_acceleration(level)
+            
+            if success:
+                self.load_current_settings()
+                level_names = {MouseAcceleration.LOW: "Baixo", MouseAcceleration.MEDIUM: "Médio", MouseAcceleration.HIGH: "Alto"}
+                self.log_message(f"Aceleracao definida para nivel {level_names.get(level, 'Desconhecido')}")
+            else:
+                messagebox.showerror("Erro", "Falha ao definir o nível de aceleração")
+                
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao definir o nível de aceleração:\n{e}")
+            self.log_message(f"Erro ao definir o nível de aceleração: {e}", "ERROR")
+    
+    def test_double_click(self):
+        """Testa a velocidade do duplo clique"""
