@@ -888,7 +888,350 @@ Seguranca:
     
     def test_double_click(self):
         """Testa a velocidade do duplo clique"""
+        messagebox.showinfo("Teste de Duplo CLique",
+                            f"Velocidade atual: {self.dclick_vat.set()}ms\n\n"
+                            "Teste fazendo duplo clique em qualquer lugar da interface.\n"
+                            "Se for muito lento ou rapido, ajuste o valor e aplique.")
         
+    def show_settings_summary(self):
+        """Mostra um resumo das configuracoes atuais"""
+        try:
+            summary = self.system_settings.get_settings_summary()
+            
+            summary_text = "Resumo das configuracoes atuais:\n\n"
+            for key, value in summary.items():
+                key_formatted = key.replace('_', '').title()
+                summary_text += f"{key_formatted}: {value}\n"
+                
+            messagebox.showinfo("Resumo das Configurações", summary_text)
+            
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao obter resumo:\n{e}")
+            
+    def refresh_all_data(self):
+        """Atualiza todos os dados da aplicacao"""
+        self.status_var.set("Atualizando todos os dados...")
+        self.load_current_settings()
+        self.refresh_mice_list()
+        self.load_system_info()
+        self.log_message("Todos os dados foram atualizados")
+        
+    #metodos da aba avancada
+    def load_system_info(self):
+        """Carrega informacoes do sistema"""
+        def load_in_thread():
+            try:
+                system_info = self.system_settings.get_system_info()
+                
+                info_text = "Informacoes do Sistema:\n\n"
+                
+                if 'windows_version' in system_info:
+                    version = system_info['windows_version']
+                    info_text += f"Windows: {version.major}.{version.minor} Build {version.build}\n"
+                    
+                info_text += f"Privilegios Admin: {'Necessarios' if system_info.get('admin_required', True) else 'Nao necessario'}\n"
+                info_text += f"Suporte Troca Botoes: {'Sim' if system_info.get('swap_button_support', False) else 'Nao'}\n"
+                info_text += f"DPI Aware: {'Sim' if system_info.get('system_dpi_aware', False) else 'Nao'}\n"
+                
+                if 'double_click_area' in system_info:
+                    area = system_info['double_click_area']
+                    info_text += f"Area Duplo Clique: {area[0]}x{area[1]}pixels\n"
+                    
+                self.root.after(0, lambda: self._update_system_info_display(info_text))
+                
+            except Exception as e:
+                error_text = f"Erro ao carregar informacoes do sistema:\n{e}"
+                self.root.after(0, lambda: self._update_system_info_display(error_text))
+                self.log_message(error_text, "ERROR")
+                
+        threading.Thread(target=load_in_thread, daemon=True).start()
+        
+    def _update_system_info_display(self, text: str):
+        """Atualiza a exibicao das informacoes do sistema"""
+        self.system_info_text.delete(1.0, tk.END)
+        self.system_info_text.insert(1.0, text)
+        
+    def run_system_check(self):
+        """Executa verificacao do sistema"""
+        def check_in_thread():
+            try:
+                self.status_var.set("Executando verificação do sistema...")
+                
+                check_results = []
+                
+                #verifica deteccao de mouses
+                mice_count = self.mouse_detector.get_mouse_count()
+                check_results.append(f"Mouses detectados: {mice_count}")
+                
+                #verifica configuracoes
+                try:
+                    current_speed = self.system_settings.get_mouse_speed()
+                    check_results.append(f"COnfiguracoes: velocidade atual {current_speed}")
+                except:
+                    check_results.append("Erro ao obter configuracoes de velocidade do mouse")
+                
+                #verifica privilegios
+                admin_required = self.system_settings.is_admin_required()
+                check_results.append(f"{'ixiii' if admin_required else 'daleee'} Privilegios: {'Admin necessario' if admin_required else 'Suficiente'}")
+                
+                result_text = "Verificacao do Sistema:\n\n" + "\n".join(check_results)
+                
+                self.root.after(0, lambda: messagebox.showinfo("Verificacao do Sistema", result_text))
+                self.root.after(0, lambda: self.status_var.set("verificacao concluida"))
+                
+            except Exception as e:
+                error_msg = f"Erro na verificacao: {e}"
+                self.root.after(0, lambda: messagebox.showerror("Erro", error_msg))
+                self.log_message(error_msg, "ERROR")
+                
+        threading.Thread(target=check_in_thread, daemon=True).start()
+        
+    def show_hid_stats(self):
+        """Mostra estatisticas do dispositivos HID"""
+        try:
+            summary = self.mouse_detector.get_mouse_summary()
+            
+            stats_text = f"""Estastiticas HID:
+            
+Total de Mouses: {summary['total']}
+• USB: {summary['usb']}
+• Bluetooth: {summary['bluetooth']}
+• Outros: {summary['outros']}
+
+Última Atualização: {time.strftime('%H:%M:%S')}
+Cache Ativo: {'Sim' if hasattr(self.mouse_detector, '_cache_valid') else 'Não'}
+"""
+
+            messagebox.showinfo("Estatisticas HID", stats_text)
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Erro ao obter estatisticas:\n{e}")
+            
+    def run_performance_test(self):
+        """Executa testes de performance"""
+        def test_in_thread():
+            try:
+                self.status_var.get("executando teste de performance...")
+                
+                #teste de deteccao
+                start_time = time.time()
+                self.mouse_detector.get_connected_mice(force_refresh=True)
+                detection_time = time.time() - start_time
+                
+                #teste de configuracoes
+                start_time = time.time()
+                self.system_settings.get_current_settings()
+                settings_time = time.time() - start_time
+                
+                results = f"""Teste de Performance:
+
+Detecção de Mouses: {detection_time:.3f}s
+Carregamento de Configurações: {settings_time:.3f}s
+
+Performance: {'Excelente' if detection_time < 0.5 else 'Boa' if detection_time < 1.0 else 'Lenta'}
+"""
+
+                self.root.after(0, lambda: messagebox.showinfo("teste de performance", results))
+                self.root.after(0, lambda: self.status_var.set("Teste concluido"))
+                
+            except Exception as e:
+                error_msg = f"Erro durante o teste de performance: {e}"
+                self.root.after(0, lambda: messagebox.showerror("Erro", error_msg))
+                self.log_message(f"error_msg, {e}")
+                
+        threading.Thread(target=test_in_thread, daemon=True).start()
+        
+    #metodos de log e utilitarios
+    def log_message(self, message: str, level: str = "INFO"):
+        """Adiciona mensagem ao log"""
+        try:
+            timestamp = time.strtime('%H:%M:%S')
+            log_entry = f"[{timestamp}] {level}: {message}\n"
+            
+            self.log_text.insert(tk.END, log_entry)
+            self.log_text.see(tk.END)
+            
+            #limite o tamanho do log
+            lines = self.log_text.delete(1.0, f"{len(lines)-500}.0")
+            if len(lines) > 1000:
+                self.log_text.delete(1.0, f"{len(lines)-500}.0")
+            
+        except Exception:
+            pass #isso teoricamente vai evitar loops de erro no log (euespero)
+        
+    def clear_log(self):
+        """Limpa o log"""
+        self.log_text.delete(1.0, tk.END)
+        self.log_message("Log limpo")
+        
+    def save_log(self):
+        """salva o log em arquivo"""
+        try:
+            from tktinter import filedialog
+            
+            filename = filedialog.asksaveasfilename(
+                defaultextension=".txt", 
+                filetypes=[("Arquivos de texto", "*.txt"), ("All files", "*.*")],
+                title="Salvar Log"
+            )
+            
+            if filename:
+                with open(filename, 'w', encoding='utf-8') as f:
+                    file.write(self.log_text.get(1.0, tk.END))
+                    
+                messagebox.showinfo("Sucesso", f"Log salvo em:\n{filename}")
+                self.log_message(f"Log salvo em: {filename}")
+                
+        except Exception as e:
+            messagebox.showerror("Erro", f"Falha ao salvar o log:\n{e}")
+            
+    #metodos de exportacao e detlahes
+    def show_deatuled_info(self):
+        """Mostra informacoes detalhadas dos mouses"""
+        try:
+            mice = self.mouse_detector.mice_info
+            
+            if not mice:
+                messagebox.showinfo("Informacao", "Nenhum mouse detectado.")
+                return
+            
+            #cria janela de detalhes
+            detail_window = tk.Toplevel(self.root)
+            detail_window.title("Informacoes detalhadas dos Mouses")
+            detail_window.geometry("800x600")
+            
+            #texto com scroll
+            text_widget = scrolledtext.ScrolledText(detail_window, wrap=tk.WORD, font=('Consolas', 9))
+            text_widget.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            #gera texto detalhado
+            detailed_text = "🖱️ INFORMAÇÕES DETALHADAS DOS MOUSES\n"
+            detailed_text += "=" * 80 + "\n\n"
+            
+            for i, mouse in enumerate(mice, 1):
+                detailed_text += f"MOUSE {i}:\n"
+                detailed_text += f"  Nome: {mouse.name}\n"
+                detailed_text += f"  Fabricante: {mouse.manufacturer}\n"
+                detailed_text += f"  Vendor ID: {mouse.vendor_id}\n"
+                detailed_text += f"  Product ID: {mouse.product_id}\n"
+                detailed_text += f"  Conexão: {mouse.connection_type}\n"
+                detailed_text += f"  Serial: {mouse.serial_number}\n"
+                detailed_text += f"  Release: {mouse.release_number}\n"
+                detailed_text += f"  Interface: {mouse.interface_number}\n"
+                detailed_text += f"  Usage Page: {mouse.usage_page}\n"
+                detailed_text += f"  Usage: {mouse.usage}\n"
+                detailed_text += f"  Path: {mouse.path}\n"
+                detailed_text += "-" * 80 + "\n\n"
+                
+            text_widget.insert(1.0, detailed_text)
+            
+        except Exception as e:
+            messagebox.showerror("Erro", f"Ocorreu um erro ao exibir informações detalhadas:\n{e}")
+            
+    def export_mice_info(self):
+        """Exporta informacoes dos mouses para arquivos"""
+        try:
+            from tkinter import filedialog
+            import json
+            
+            mice = self.mouse_detector.mice_info
+            
+            if not mice:
+                messagebox.showinfo("Informacao", "Nenhum mouse para exportar.")
+                return
+            
+            filename = filedialog.asksaveasfilename(
+                defaultextension=".json",
+                filetypes=[("JSON", "*.json"), ("Texto", "*.txt"), ("All files", "*.*")],
+                title="Exportar Informacoes dos Mouses"
+            )
+            
+            if filename:
+                #converte para dicionario (json)
+                mice_data = [asdict(mouse) for mouse in mice]
+                
+                if filename.endswith('.json'):
+                    with open(filename, 'w', encoding='utf-8') as f:
+                        json.dump(mice_data, f, indent=2, ensure_ascii=False)
+                else:
+                    with open(filename, 'w', encoding='utf-8') as f:
+                        for mouse in mice:
+                            f.write(f"Nome: {mouse.name}\n")
+                            f.write(f"Fabricante: {mouse.manufacturer}\n")
+                            f.write(f"VID: {mouse.vid}\n")
+                            f.write(f"PID: {mouse.pid}\n")
+                            f.write(f"Conexao: {mouse.connection_type}\n")
+                            f.write(f"Serial: {mouse.serial_number}\n")
+                            f.write("-" * 50 + "\n")
+                            
+                messagebox.showinfo("Sucesso", f"Informacoes exportadas para:\n{filename}")
+                self.log_message(f"Informacoes exportadas para: {filename}")
+                
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao exportar:\n{e}")
+            
+    def sort_treeview(self, column):
+        """Ordena o treeview por coluna"""
+        try:
+            items = [(self.mice_tree.set(item, column), item) for item in self.mice_tree.get_children('')]
+            item.sort()
+            
+            for index, (val, item) in enumerate(items):
+                self.mice_tree.move(item, '', index)
+                
+        except Exception as e:
+            self.log_message(f"Erro ao ordenar o treeview: {e}", "ERROR")
+            
+    #Auto-refresh
+    def start_auto_refresh(self):
+        """Inicia o refresh automático"""
+        if self.auto_refresh_enable.get():
+            self.refresh_job = self.root.after(self.refresh_interval, self.auto_refresh_callback)
+            
+    def auto_refresh_callback(self):
+        """Callback do refresh automatico"""
+        if self.auto_refresh_enable.get():
+            self.refresh_mice_list()
+            self.refresh_job = self.root.after(self.refresh_interval, self.auto_refresh_callback)
+            
+        def toggle_auto_refresh(self):
+            """Liga/desliga o refresh automático"""
+            if self.auto_refresh_enable.get():
+                self.start_auto_refresh()
+                self.log_message("Auto-refresh habilitado")
+            else:
+                if self.refresh_job:
+                    self.root.after_cancel(self.refresh_job)
+                    self.refresh_job = None
+                self.log_message("Auto-refresh desabilitado")
+                
+    def update_admin_status(self):
+        """Atualiza o status de administrador"""
+        try:
+            admin_required = self.system_settings.is_admin_required()
+            if admin_required:
+                self.admin_label.config(text="Admin Req.", style='Warning.TLabel')
+            else:
+                self.admin_label.config(text="Privilegios OK", style='Success.TLabel')
+        except:
+            self.admin_label.config(text='Desconhecido', style='Error.TLabel')
+            
+    def on_closing(self):
+        """Callback para fechamento da janela"""
+        try:
+            #cancela refresh automatico
+            if self.refresh_job:
+                self.root.after_cancel(self.refresh_job)
+                
+            #salva log se necessario
+            self.log_message("Aplicacao encerrada")
+            
+            #fecha a janela
+            self.root.destroy()
+            
+        except Exception:
+            self.root.destroy()
+              
     def run(self):
         """Inicia a aplicação"""
         try:
