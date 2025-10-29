@@ -679,6 +679,8 @@ Seguranca:
         """Mostra detalhes do mouse selecionado"""
         try:
             details = ''
+        except Exception as e:
+            pass
             
     def load_current_settings(self):
         """Carrega as configuracoes atuais do sistema"""
