@@ -16,14 +16,14 @@ from pathlib import Path
 from typing import Required
 from unittest import result
 
-#Add the projetct root to python path
+# Add the projetct root to python path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root)) #trocar depois
 
 try:
     from views.main_window import MouseManagerGUI
     from modules.mouse_detector import MouseDetector
-    from modules.system_settings import system_settings
+    from modules.system_settings import SystemMouseSettings
 except ImportError as e:
     print(f"Import error: {e}")
     print("Certifique-se de que todos os arquios estao no local certo")
@@ -101,7 +101,7 @@ class MouseManagerApp:
         try:
             #testar acesso aos modulos principais
             detector = MouseDetector()
-            settings = system_settings()
+            settings = SystemMouseSettings()
             
             #testar operacoes basicas
             detector.get_connected_mice()
