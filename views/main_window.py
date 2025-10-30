@@ -187,7 +187,7 @@ class MouseManagerGUI:
     def setup_detection_tab(self):
         """Configura a aba de deteccao de mouses"""
         detection_frame = ttk.Frame(self.notebook)
-        self.notebook.add(detection_frame, texto="Mouses Detectados")
+        self.notebook.add(detection_frame, text="Mouses Detectados")
         
         #Frame superior com informacoes e controles
         top_frame = ttk.Frame(detection_frame)
@@ -222,7 +222,7 @@ class MouseManagerGUI:
         
         #configuracao do treeview
         colums = ('Nome', 'Fabricante', 'VID', 'PID', 'Conexao', 'Serial', 'Release')
-        self.mice_tree = ttk.Treeview(tree_frame, colums=colums, show='headings', height=8)
+        self.mice_tree = ttk.Treeview(tree_frame, columns=colums, show='headings', height=8)
         
         #configurar colunas
         column_widths = {'Nome': 200, 'Fabricante': 150, 'VID': 80, 'PID': 80,
@@ -1088,7 +1088,7 @@ Performance: {'Excelente' if detection_time < 0.5 else 'Boa' if detection_time <
             messagebox.showerror("Erro", f"Falha ao salvar o log:\n{e}")
             
     #metodos de exportacao e detlahes
-    def show_deatuled_info(self):
+    def show_detailed_info(self):
         """Mostra informacoes detalhadas dos mouses"""
         try:
             mice = self.mouse_detector.mice_info
