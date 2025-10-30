@@ -129,7 +129,7 @@ class MouseDetector:
             return True
         
         #criterio 2: verifica pelo nome do produto
-        product_string: device.get('product_string', '').lower()
+        product_string = device.get('product_string', '').lower
         if any(keyword in product_string for keyword in self.MOUSE_KEYWORDS):
             return True
         
@@ -224,7 +224,7 @@ class MouseDetector:
         
         return f"Fabricante Desconhecido (VID: 0x{vendor_id:04X})"
     
-    def _get_connection_type(self, path: byts) -> str:
+    def _get_connection_type(self, path: bytes) -> str:
         """
         Determina o tipo de conexao baeasdo no path do dispositivo
         

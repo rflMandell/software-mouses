@@ -37,7 +37,7 @@ class MouseManagerGUI:
         #inicializa os modulos
         try:
             self.mouse_detector = MouseDetector()
-            self.system_settings = SystemMousSettings()
+            self.system_settings = SystemMouseSettings()
         except Exception as e:
             messagebox.showerror("Erro de inicializacao",
                                  f"Erro ao inicializar modulos:\n {e}")
@@ -119,7 +119,7 @@ class MouseManagerGUI:
         
         #configura o tema
         try:
-            styles.theme_use('clam')
+            style.theme_use('clam')
         except:
             pass
         
@@ -167,20 +167,20 @@ class MouseManagerGUI:
         buttom_frame = ttk.Frame(toolbar)
         buttom_frame.pack(side=tk.RIGHT)
         
-        ttk.Button(button_frame, text="Atualizar Tudo",
+        ttk.Button(buttom_frame, text="Atualizar Tudo",
                    command=self.refresh_all_data).pack(side=tk.LEFT, padx=2)
         
-        ttk.Button(button_frame, text="Backup",
+        ttk.Button(buttom_frame, text="Backup",
                    command=self.create_backup).pack(side=tk.LEFT, padx=2)
         
-        ttk.Button(button_frame, text="Restaurar",
+        ttk.Button(buttom_frame, text="Restaurar",
                    command=self.restore_backup).pack(side=tk.LEFT, padx=2)
         
-        ttk.Button(button_frame, text="Padroes",
+        ttk.Button(buttom_frame, text="Padroes",
                    command=self.restore_defaults).pack(side=tk.LEFT, padx=2)
         
         #checkbox para auto-refresh
-        ttk.Checkbutton(button_frame, text="Auto-refresh",
+        ttk.Checkbutton(buttom_frame, text="Auto-refresh",
                         variable=self.auto_refresh_enable,
                         command=self.toggle_auto_refresh).pack(side=tk.LEFT, padx=5)
         
@@ -197,7 +197,7 @@ class MouseManagerGUI:
         info_frame = ttk.LabelFrame(top_frame, text="Resumo")
         info_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0,5))
         
-        self.mice_count_label = ttk.Label(into_frame, textvariable=self.mice_count_var,
+        self.mice_count_label = ttk.Label(info_frame, textvariable=self.mice_count_var,
                                           style='Subtitle.TLabel')
         self.mice_count_label.pack(anchor=tk.W, padx=5, pady=2)
         
@@ -207,7 +207,7 @@ class MouseManagerGUI:
         
         #botoes de controle
         control_frame = ttk.Frame(top_frame)
-        control_frame.pack(side.RIGHT)
+        control_frame.pack(side="right")
         
         ttk.Button(control_frame, text="Atualizar Lista",
                    command=self.refresh_mice_list).pack(pady=2)
@@ -228,12 +228,12 @@ class MouseManagerGUI:
         column_widths = {'Nome': 200, 'Fabricante': 150, 'VID': 80, 'PID': 80,
                          'Conexao': 100, 'Serial': 120, 'Release': 80}
         
-        for col in columns:
+        for col in colums:
             self.mice_tree.heading(col, text=col, command=lambda c=col: self.sort_treeview(c))
             self.mice_tree.column(col, width=column_widths.get(col, 100), minwidth=60)
             
         # scrollbars para o treeview
-        tree_scoll_frame = ttk.Frame(tree_frame)
+        tree_scroll_frame = ttk.Frame(tree_frame)
         tree_scroll_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
         v_scrollbar = ttk.Scrollbar(tree_scroll_frame, orient=tk.VERTICAL,
@@ -279,17 +279,17 @@ class MouseManagerGUI:
             lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
         )
         
-        canvas.create_windoe((0, 0), window=scollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scollbar.set)
+        canvas.create_windoe((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
         
         #configuracoes principais
-        self.setup_speed_settings(scollable_frame)
+        self.setup_speed_settings(scrollable_frame)
         self.setup_acceleration_settings(scrollable_frame)
-        self.setup_click_settings(scollable_frame)
-        self.setup_advanced_settings(scollable_frame)
+        self.setup_click_settings(scrollable_frame)
+        self.setup_advanced_settings(scrollable_frame)
         
         #botao de acao
-        self.setup_action_buttons(scollable_frame)
+        self.setup_action_buttons(scrollable_frame)
         
         #pack canvas e scrollbar
         canvas.pack(side="left", fill="both", expand=True)
@@ -308,7 +308,7 @@ class MouseManagerGUI:
         speed_control_frame = ttk.Frame(speed_frame)
         speed_control_frame.pack(fill=tk.X, padx=5, pady=2)
         
-        self.speed_scale = ttk.Scale(speed_contro_frame, from_=1, to=20, orient=tk.HORIZONTAL,
+        self.speed_scale = ttk.Scale(speed_control_frame, from_=1, to=20, orient=tk.HORIZONTAL,
                                      variable=self.speed_var, command=self.on_speed_change)
         self.speed_scale.pack(side=tk.LEFT, fill=tk.X, expand=True)
         
@@ -359,7 +359,7 @@ class MouseManagerGUI:
         
     def setup_click_settings(self, parent):
         """Configura controles de clique"""
-        click_frame = ttkLabelFrame(parent, text="Configuracoes de Clique")
+        click_frame = ttk.LabelFrame(parent, text="Configuracoes de Clique")
         click_frame.pack(fill=tk.X, padx=10, pady=5)
         
         #velodicdade do duplo clique
@@ -394,11 +394,11 @@ class MouseManagerGUI:
         
         #scroll da roda
         whell_subframe = ttk.Frame(advanced_frame)
-        shell_subframe.pack(fill=tk.X, padx=10, pady=5)
+        whell_subframe.pack(fill=tk.X, padx=10, pady=5)
         
-        ttk.Label(wheel_subframe, text="Linhas por scroll da roda (1-100):").pack(anchor=tk.W)
+        ttk.Label(whell_subframe, text="Linhas por scroll da roda (1-100):").pack(anchor=tk.W)
         
-        wheel_control_frame = ttk.Frame(wheel_subframe)
+        wheel_control_frame = ttk.Frame(whell_subframe)
         wheel_control_frame.pack(fill=tk.X, pady=2)
         
         self.wheel_scale = ttk.Scale(wheel_control_frame, from_=1, to=100, orient=tk.HORIZONTAL,
@@ -430,7 +430,7 @@ class MouseManagerGUI:
         button_frame.pack(fill=tk.X, padx=10, pady=10)
         
         # Primeira linha de botoes
-        row1 = ttk.Frame(buton_frame)
+        row1 = ttk.Frame(button_frame)
         row1.pack(fill=tk.X, padx=5, pady=2)
         
         ttk.Button(row1, text="Aplicar configuracoes", 
@@ -441,7 +441,7 @@ class MouseManagerGUI:
                    command=self.restore_defaults).pack(side=tk.LEFT, padx=2)
         
         #segunda linha de butoes
-        row2 = ttk.Frame(buton_frame)
+        row2 = ttk.Frame(button_frame)
         row2.pack(fill=tk.X, padx=5, pady=2)
         
         ttk.Button(row2, text="Criar Backup",
@@ -457,7 +457,7 @@ class MouseManagerGUI:
         self.notebook.add(advanced_frame, text="Avancado")
         
         #informacoes do sistema
-        system_frame = ttkLabelFrame(advanced_frame, text="Informacoes do Sistema")
+        system_frame = ttk.LabelFrame(advanced_frame, text="Informacoes do Sistema")
         system_frame.pack(fill=tk.X, padx=10, pady=5)
         
         self.system_info_text = scrolledtext.ScolledText(system_frame, height=8, wrap=tk.WORD,
@@ -501,7 +501,7 @@ class MouseManagerGUI:
         self.notebook.add(about_frame, text="Sobre")
         
         #titulo e versao
-        title_frame = ttk.Frame(about_time)
+        title_frame = ttk.Frame(about_frame)
         title_frame.pack(fill=tk.X, padx=20, pady=20)
         
         ttk.Label(title_frame, text="Mouse Manager MPV",
@@ -1079,7 +1079,7 @@ Performance: {'Excelente' if detection_time < 0.5 else 'Boa' if detection_time <
             
             if filename:
                 with open(filename, 'w', encoding='utf-8') as f:
-                    file.write(self.log_text.get(1.0, tk.END))
+                    filename.write(self.log_text.get(1.0, tk.END))
                     
                 messagebox.showinfo("Sucesso", f"Log salvo em:\n{filename}")
                 self.log_message(f"Log salvo em: {filename}")

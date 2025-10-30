@@ -57,13 +57,13 @@ class MouseManagerApp:
             )
             
             self.logger = logging.getLogger(__name__)
-            slef.logger.info("MOuse manager Iniciador!!! uwu")
+            self.logger.info("MOuse manager Iniciador!!! uwu")
             
         except Exception as e:
             print(f"Erro ao configurar logging: {e}")
             #configuracao basica de fallback
             logging.basicCOnfig(level=logging.INFO)
-            self.logger = loggin.getLogger(__name__)
+            self.logger = logging.getLogger(__name__)
             
     def check_requirements(self):
         """Verifica se todos os reuisitos estao atenditos"""
@@ -101,7 +101,7 @@ class MouseManagerApp:
         try:
             #testar acesso aos modulos principais
             detector = MouseDetector()
-            settings = SystemSettings()
+            settings = system_settings()
             
             #testar operacoes basicas
             detector.get_connected_mice()

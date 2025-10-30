@@ -104,13 +104,13 @@ class SystemMouseSettings:
             result = self.user32.SystemParametersInfoW(
                 self.SPI_GETMOUSESPEED,
                 0,
-                byref(speed),
+                byref(spped),
                 0
             )
             
             if result:
                 #Garante que esta no range valido
-                return max(1, min(20, speed.value))
+                return max(1, min(20, spped.value))
             else:
                 return self.default_settings.speed
             
@@ -192,8 +192,8 @@ class SystemMouseSettings:
         """
         try:
             #valida os parametros
-            threshold1 = max(0, min(20, int(threshol1)))
-            threshold2 = max(0, min(20, int(threshol2)))
+            threshold1 = max(0, min(20, int(threshold1)))
+            threshold2 = max(0, min(20, int(threshold2)))
             acceleration = max(0, min(3, int(acceleration)))
             
             mouse_params = (c_int * 3)(threshold1, threshold2, acceleration)
@@ -230,7 +230,7 @@ class SystemMouseSettings:
             MouseAcceleration.HIGH: (8,12,2)
         }
         
-        threshold1, threshold2, factor = acceleration_config.get(
+        threshold1, threshold2, factor = acceleration_configs.get(
             level, acceleration_configs[MouseAcceleration.MEDIUM]
         )
         
@@ -314,7 +314,7 @@ class SystemMouseSettings:
             else:
                 return self.default_settings.swap_buttons
             
-        except exception as e:
+        except Exception as e:
             print(f"Erro ao obter troca de botoes: {e}")
             return False
         
@@ -497,15 +497,15 @@ class SystemMouseSettings:
                 swap_buttons=self.get_button_swap(),
                 wheel_scroll_lines=self.get_whell_scroll_lines(),
                 hover_time=self.get_hover_time(),
-                drag_width=drag_width,
+                drag_width=drag_widht,
                 drag_height=drag_height
             )
             
             #atualiza o cache
-            self._settings_cache = settings 
+            self._settings_cache = seetings 
             self._cache_valid = True 
             
-            return settings 
+            return seetings 
         
         except Exception as e:
             print(f"Erro ao obter configuracoes: {e}")
@@ -521,7 +521,7 @@ class SystemMouseSettings:
         Returns:
             Dict[str, bool]: Resultado de cada configuracao aplicada
         """
-        results: {}
+        results = {}
         
         try:
             results['speed'] = self.set_mouse_speed(settings.speed)
@@ -531,8 +531,8 @@ class SystemMouseSettings:
                 settings.acceleration_factor
             )
             results['double_click'] = self.set_double_click_speed(settings.double_click_speed)
-            result['button_swap'] = self.set_button_swap(settings.swap_button)
-            result['wheel_scroll'] = self.set_wheel_scrool_lines(settings.wheel_scroll_lines)
+            results['button_swap'] = self.set_button_swap(settings.swap_button)
+            results['wheel_scroll'] = self.set_wheel_scrool_lines(settings.wheel_scroll_lines)
             results['hover_time'] = self.set_hover_time(settings.hover_time)
             
         except Exception as e:
