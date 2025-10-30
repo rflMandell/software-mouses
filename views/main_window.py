@@ -29,9 +29,9 @@ class MouseManagerGUI:
     Fornece uma experiencia completa de gerenciamento de mouses
     """
     
-    def __init__(self):
+    def __init__(self, root):
         """Inicializa a interface grafica"""
-        self.rott = tk.Tk()
+        self.root = tk.Tk()
         self.setup_window()
         
         #inicializa os modulos
@@ -108,10 +108,10 @@ class MouseManagerGUI:
         self.mice_count_var = tk.StringVar(value="0 mouses detectados")
         
         #bind para mudancas automaticas
-        self.speed_var.trace('w', self.on_setting_change)
-        self.dclick_var.trace('w', self.on_setting_change)
-        self.wheel_lines_var.trace('w', self.on_setting_change)
-        self.hover_time_var.trace('w', self.on_setting_change)
+        self.speed_var.trace('w', self.on_settings_change)
+        self.dclick_var.trace('w', self.on_settings_change)
+        self.wheel_lines_var.trace('w', self.on_settings_change)
+        self.hover_time_var.trace('w', self.on_settings_change)
         
     def setup_styles(self):
         """COnfigura estilos personalizados"""
