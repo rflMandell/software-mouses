@@ -1144,7 +1144,7 @@ Performance: {'Excelente' if detection_time < 0.5 else 'Boa' if detection_time <
             
             filename = filedialog.asksaveasfilename(
                 defaultextension=".json",
-                filetypes=[("JSON", "*.json"), ("Texto", "*.txt"), ("All files", "*.*")],
+                filetypes=[("JSON", "*.json"), ("texto", "*.txt"), ("All files", "*.*")],
                 title="Exportar Informacoes dos Mouses"
             )
             
@@ -1196,16 +1196,16 @@ Performance: {'Excelente' if detection_time < 0.5 else 'Boa' if detection_time <
             self.refresh_mice_list()
             self.refresh_job = self.root.after(self.refresh_interval, self.auto_refresh_callback)
             
-        def toggle_auto_refresh(self):
-            """Liga/desliga o refresh automático"""
-            if self.auto_refresh_enable.get():
-                self.start_auto_refresh()
-                self.log_message("Auto-refresh habilitado")
-            else:
-                if self.refresh_job:
-                    self.root.after_cancel(self.refresh_job)
-                    self.refresh_job = None
-                self.log_message("Auto-refresh desabilitado")
+    def toggle_auto_refresh(self):
+        """Liga/desliga o refresh automático"""
+        if self.auto_refresh_enable.get():
+            self.start_auto_refresh()
+            self.log_message("Auto-refresh habilitado")
+        else:
+            if self.refresh_job:
+                self.root.after_cancel(self.refresh_job)
+                self.refresh_job = None
+            self.log_message("Auto-refresh desabilitado")
                 
     def update_admin_status(self):
         """Atualiza o status de administrador"""

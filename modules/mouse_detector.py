@@ -91,7 +91,7 @@ class MouseDetector:
             
             for device in devices:
                 #filtra apenas dispositivos que sao mouses
-                if self._is_mouse_device(device):
+                if self._is_mouse_is_device(device):
                     mouse_info = self._extract_mouse_info(device)
                     if mouse_info:
                         self.mice_info.append(mouse_info)
@@ -165,7 +165,7 @@ class MouseDetector:
             name = self._get_device_name(device, vendor_id, product_id)
             
             #fabricante com fallback para VIDs conhecidos
-            manufacturer = self._get_manufacturer(device, vendor_id)
+            manufacturer = self._get_manufacturer_name(device, vendor_id)
             
             #determina o tipo de conexao
             connection_type = self._get_connection_type(device.get('path', b''))
