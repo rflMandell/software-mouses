@@ -95,7 +95,7 @@ python -m venv software-mouses_env
 # Windows
 software-mouses_env\Scripts\activate
 
-# Linux/Mac (se aplicável)
+# Linux/Mac (o software nao funciona no Linux/Mac, porem caso estejam codando nesses sistemas, ative o ambiente com o comando abaixo)
 source software-mouses_env/bin/activate
 ```
 
