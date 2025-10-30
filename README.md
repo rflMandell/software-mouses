@@ -2,24 +2,6 @@
 
 Um software de gerenciamento e configuracao de mouses.
 
-## Índice
-
-* [Características](#-caracter%C3%ADsticas)
-
-* [Requisitos do Sistema](#-requisitos-do-sistema)
-
-* [Instalação](#-instala%C3%A7%C3%A3o)
-
-* [Como Usar](#-como-usar)
-
-* [Estrutura do Projeto](#-estrutura-do-projeto)
-
-* [Funcionalidades Detalhadas](#-funcionalidades-detalhadas)
-
-* [Solução de Problemas](#-solu%C3%A7%C3%A3o-de-problemas)
-
-* [Desenvolvimento](#-desenvolvimento)
-
 ## Características
 
 ### **Detecção Automática**
